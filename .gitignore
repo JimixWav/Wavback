@@ -1,0 +1,19 @@
+# Outils installés par les lanceurs (Node.js portable, yt-dlp, FFmpeg)
+/bin/
+
+# Réglages propres à chaque installation
+config.json
+settings.json
+settings.json.tmp
+cleanup-registry.json
+
+# Restes de la version Python (V1)
+__pycache__/
+.venv/
+
+# Divers
+node_modules/
+.DS_Store
+._*
+*.zip
+*.log

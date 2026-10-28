@@ -1,0 +1,32 @@
+{
+  "app": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "open_browser": true
+  },
+  "auth": {
+    "user": "admin",
+    "password": ""
+  },
+  "downloads": {
+    "dir": "~/Downloads/Wavback",
+    "youtube_playlist_url": "",
+    "soundcloud_playlist_url": "",
+    "name_template_title": "%(title)s.%(ext)s",
+    "name_template_uploader_title": "%(uploader)s - %(title)s.%(ext)s",
+    "default_format": "mp3",
+    "max_filesize": ""
+  },
+  "cleanup": {
+    "max_age_minutes": 0,
+    "interval_minutes": 10
+  },
+  "executables": {
+    "yt_dlp": "bin/yt-dlp",
+    "ffmpeg_location": "bin/ffmpeg",
+    "js_runtime": "node"
+  },
+  "update": {
+    "enabled": true
+  }
+}

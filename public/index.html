@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Wavback</title>
+    <link rel="icon" type="image/svg+xml" href="/static/logo.svg" />
+    <link rel="apple-touch-icon" href="/static/icon-192.png" />
+    <link rel="stylesheet" href="/static/css/styles.css?v={{ asset_version }}" />
+  </head>
+  <body>
+    <main class="page" id="page">
+      <header class="topbar">
+        <div>
+          <h1 class="brand"><img src="/static/logo.svg" alt="" width="40" height="40" />Wavback</h1>
+          <p class="subtitle">L'audio ou la vidéo de YouTube et SoundCloud, dans le format de ton choix.</p>
+        </div>
+        <div class="topbar-actions">
+          <a class="health" href="#settings" id="health-link" title="Voir le diagnostic">
+            <span id="chip-pro" class="chip chip-pro" hidden>Mode pro</span>
+            <span id="chip-ytdlp" class="chip">yt-dlp</span>
+            <span id="chip-ffmpeg" class="chip">ffmpeg</span>
+            <span id="chip-folder" class="chip">Dossier</span>
+          </a>
+          <button id="btn-quit" class="btn btn-quit" type="button" title="Arrêter l'application" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9" /><path d="M6.3 6.3a8 8 0 1 0 11.4 0" /></svg>
+            Quitter
+          </button>
+        </div>
+      </header>
+
+      <div id="app-error" class="message message-error" role="alert" hidden></div>
+      <div id="app-success" class="message message-success" role="status" hidden></div>
+
+      <div class="layout">
+        <section class="card download-card" aria-labelledby="download-title">
+          <h2 id="download-title">Télécharger</h2>
+
+          <fieldset class="format-picker">
+            <legend>Format du fichier</legend>
+            <div id="format-options" class="segmented segmented-5"></div>
+            <p id="format-hint" class="hint"></p>
+            <p id="pro-tip" class="pro-tip">
+              Débit, bits, résolution vidéo et dossier se règlent dans le
+              <button id="btn-pro-tip" class="link-button" type="button">Mode pro</button>.
+            </p>
+          </fieldset>
+
+          <form id="manual-form" class="url-form">
+            <label for="manual-url">Lien YouTube ou SoundCloud</label>
+            <div class="inline-row">
+              <input id="manual-url" name="url" type="url" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off" required />
+              <button type="submit" class="btn btn-primary" data-busy-disable>Lancer</button>
+            </div>
+            <div id="link-preview" class="link-preview" aria-live="polite" hidden></div>
+            <div class="name-picker">
+              <span class="field-label" id="name-style-label">Nom du fichier</span>
+              <div class="segmented segmented-2" role="radiogroup" aria-labelledby="name-style-label">
+                <label class="segment"><input type="radio" name="name-style" value="title" /><span>Titre</span></label>
+                <label class="segment"><input type="radio" name="name-style" value="uploader" /><span>Chaîne - Titre</span></label>
+              </div>
+              <p id="name-example" class="name-example"></p>
+            </div>
+          </form>
+
+          <div id="playlists-block" class="playlists" hidden>
+            <p class="divider"><span>ou une playlist enregistrée</span></p>
+            <div id="playlist-buttons" class="playlist-buttons"></div>
+          </div>
+
+          <p class="source-note">
+            YouTube et SoundCloud diffusent en qualité compressée (environ 128 à 256 kbps). FLAC et WAV conservent cette qualité
+            telle quelle, sans l'améliorer.
+          </p>
+
+          <div class="server-files" aria-labelledby="server-files-title">
+            <div class="server-files-heading">
+              <div>
+                <h3 id="server-files-title">Fichiers téléchargés <span id="server-files-count" class="count"></span></h3>
+                <p id="server-files-note" class="section-subtitle"></p>
+              </div>
+              <div class="server-files-buttons">
+                <button id="btn-open-folder" class="btn btn-ghost btn-small" type="button" hidden>Ouvrir le dossier</button>
+                <button id="btn-refresh-files" class="btn btn-ghost btn-small" type="button">Actualiser</button>
+              </div>
+            </div>
+            <ul id="server-files-list" class="server-files-list"></ul>
+            <p id="server-files-empty" class="pro-help">Aucun fichier pour l'instant.</p>
+          </div>
+        </section>
+
+        <div class="side-column">
+          <section class="card job-card" aria-labelledby="job-title">
+            <div class="section-heading">
+              <div>
+                <h2 id="job-title">Aucune tâche</h2>
+                <p id="job-subtitle" class="section-subtitle">Lance un téléchargement pour suivre sa progression ici.</p>
+              </div>
+              <span id="job-status-badge" class="badge badge-neutral">En attente</span>
+            </div>
+
+            <div id="job-progress" class="progress-block" hidden>
+              <div class="progress-row">
+                <span id="progress-track" class="progress-track">Préparation…</span>
+                <span id="progress-count" class="progress-count"></span>
+              </div>
+              <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+              </div>
+              <div class="progress-row muted">
+                <span id="progress-percent"></span>
+                <span id="progress-speed"></span>
+              </div>
+            </div>
+
+            <div id="job-outcome" class="outcome-banner outcome-neutral" aria-live="polite">Aucune tâche en cours.</div>
+
+            <div id="files-block" class="files-block" hidden>
+              <h3>Fichiers créés <span id="files-count" class="count"></span></h3>
+              <ul id="files-list" class="files-list"></ul>
+            </div>
+
+            <div class="job-footer">
+              <dl class="job-times">
+                <div><dt>Début</dt><dd id="job-started-at">—</dd></div>
+                <div><dt>Fin</dt><dd id="job-finished-at">—</dd></div>
+                <div><dt>Code de sortie</dt><dd id="job-exit-code">—</dd></div>
+              </dl>
+              <button id="btn-stop" class="btn btn-danger" type="button" hidden>Arrêter</button>
+            </div>
+          </section>
+
+          <section class="card console-card" aria-labelledby="console-title">
+            <div class="section-heading">
+              <h2 id="console-title">Console</h2>
+              <label class="toggle"><input type="checkbox" id="autoscroll" checked /> Défilement automatique</label>
+            </div>
+            <div class="logs">
+              <div class="console-pane">
+                <h3>Sortie de yt-dlp</h3>
+                <pre id="stdout-logs" class="log-panel stdout">Aucun journal pour l'instant.</pre>
+              </div>
+              <div class="console-pane">
+                <h3>Erreurs et avertissements <span id="stderr-count" class="count"></span></h3>
+                <pre id="stderr-logs" class="log-panel stderr">Rien à signaler.</pre>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <section id="pro-card" class="card pro-card" aria-labelledby="pro-title" hidden>
+        <div class="section-heading">
+          <div>
+            <h2 id="pro-title">Mode pro</h2>
+            <p class="section-subtitle">Règle tes formats, tes playlists et ton dossier. Rien ne change avant « Enregistrer ».</p>
+          </div>
+          <button id="btn-pro-close" class="btn btn-ghost" type="button">Quitter le mode pro</button>
+        </div>
+
+        <div id="pro-loading" class="pro-loading">Chargement des réglages…</div>
+
+        <div id="pro-form" class="pro-grid" hidden>
+          <fieldset class="pro-section">
+            <legend>Formats audio</legend>
+            <div id="pro-audio" class="pro-fields"></div>
+          </fieldset>
+
+          <div class="pro-stack">
+            <fieldset class="pro-section">
+              <legend>Vidéo MP4</legend>
+              <div id="pro-video" class="pro-fields"></div>
+            </fieldset>
+
+            <fieldset class="pro-section">
+              <legend>Dossier de téléchargement</legend>
+              <div class="folder-field">
+                <input id="pro-output-dir" type="text" spellcheck="false" autocomplete="off" aria-label="Chemin du dossier de téléchargement" />
+                <button id="btn-pick-folder" class="btn btn-secondary btn-small" type="button" hidden>Choisir…</button>
+              </div>
+            </fieldset>
+
+            <fieldset class="pro-section">
+              <legend>Playlists enregistrées</legend>
+              <div id="pro-playlists" class="pro-playlists"></div>
+              <button id="btn-add-playlist" class="btn btn-ghost btn-small" type="button">+ Ajouter une playlist</button>
+            </fieldset>
+          </div>
+        </div>
+
+        <div id="pro-error" class="message message-error" role="alert" hidden></div>
+
+        <div class="pro-footer">
+          <span id="pro-dirty" class="pro-dirty" hidden>Modifications non enregistrées</span>
+          <button id="btn-pro-defaults" class="btn btn-ghost" type="button">Valeurs d'origine</button>
+          <button id="btn-pro-cancel" class="btn btn-secondary" type="button">Annuler</button>
+          <button id="btn-pro-save" class="btn btn-primary" type="button">Enregistrer</button>
+        </div>
+      </section>
+
+      <details class="card settings-card" id="settings">
+        <summary>
+          <h2>Réglages et diagnostic</h2>
+          <span id="diag-ready-badge" class="badge badge-neutral">Vérification…</span>
+        </summary>
+        <div class="settings-grid">
+          <div class="details-list">
+            <h3>Configuration</h3>
+            <div class="details-item"><span>Format par défaut</span><span id="config-default-format" class="meta-value">…</span></div>
+            <div class="details-item"><span>Playlists</span><span id="config-playlists" class="meta-value">…</span></div>
+            <div class="details-item"><span>Suppression automatique</span><span id="config-retention" class="meta-value">…</span></div>
+            <div class="details-item"><span>Taille maximale par fichier</span><span id="config-max-size" class="meta-value">…</span></div>
+          </div>
+          <div class="details-list">
+            <h3>Outils</h3>
+            <div class="details-item"><span>yt-dlp</span><span id="diag-ytdlp" class="meta-value">…</span></div>
+            <div class="details-item"><span>ffmpeg</span><span id="diag-ffmpeg" class="meta-value">…</span></div>
+            <div class="details-item"><span>ffprobe</span><span id="diag-ffprobe" class="meta-value">…</span></div>
+            <div class="details-item"><span>Moteur JavaScript</span><span id="diag-js" class="meta-value">…</span></div>
+            <div class="details-item"><span>Dossier</span><span id="diag-output" class="meta-value">…</span></div>
+            <div class="details-item"><span>Vérifié à</span><span id="diagnostics-checked-at" class="meta-value">…</span></div>
+          </div>
+        </div>
+        <div class="button-row">
+          <button id="btn-pro" class="btn btn-primary" type="button" aria-pressed="false">Mode pro</button>
+          <button id="btn-diagnostics" class="btn btn-secondary" type="button">Relancer le diagnostic</button>
+          <button id="btn-update" class="btn btn-warning" type="button" data-busy-disable>Mettre à jour yt-dlp</button>
+        </div>
+      </details>
+
+      <footer class="site-footer">
+        © 2026 jimix.wav - <a href="https://github.com/JimixWav" target="_blank" rel="noopener noreferrer">github.com/JimixWav</a> - V{{ app_major_version }}
+      </footer>
+    </main>
+
+    <div id="closed-screen" class="closed-screen" hidden>
+      <div class="card closed-card" role="status">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9" /><path d="M6.3 6.3a8 8 0 1 0 11.4 0" /></svg>
+        <h1>Application fermée</h1>
+        <p>Tu peux fermer cet onglet.</p>
+        <p class="closed-help">Pour la relancer : launch.command sur Mac, launch_windows.bat sur Windows, launch.sh sur Linux.</p>
+      </div>
+    </div>
+
+    <script src="/static/js/app.js?v={{ asset_version }}" defer></script>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    name: Tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+
+  # Runs the real installer (Node.js if needed, yt-dlp, FFmpeg), then checks that the app reports itself ready.
+  install-unix:
+    name: Installateur (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/install.sh
+      - name: Démarrer et vérifier le diagnostic
+        run: |
+          NODE=node; [ -x bin/node/bin/node ] && NODE=bin/node/bin/node
+          NO_BROWSER=1 "$NODE" server.js &
+          sleep 4
+          curl -sf http://127.0.0.1:8765/api/diagnostics | tee diagnostics.json
+          "$NODE" -e 'const d = require("./diagnostics.json"); if (!d.ready) { console.error("\nPas prêt"); process.exit(1); }'
+
+  install-windows:
+    name: Installateur (windows-latest)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installer (Windows PowerShell 5.1, comme chez les utilisateurs)
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1
+      - name: Démarrer et vérifier le diagnostic
+        shell: powershell
+        run: |
+          $node = if (Test-Path bin\node\node.exe) { "bin\node\node.exe" } else { "node" }
+          $env:NO_BROWSER = "1"
+          Start-Process -FilePath $node -ArgumentList "server.js" -NoNewWindow
+          Start-Sleep -Seconds 6
+          $d = Invoke-RestMethod http://127.0.0.1:8765/api/diagnostics
+          $d | ConvertTo-Json -Depth 4
+          if (-not $d.ready) { throw "Pas prêt" }

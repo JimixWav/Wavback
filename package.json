@@ -1,0 +1,20 @@
+{
+  "name": "wavback",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Interface web locale pour yt-dlp : audio (FLAC, WAV, MP3, AAC) et vidéo (MP4) depuis YouTube et SoundCloud.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "author": "jimix.wav",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JimixWav/Wavback.git"
+  }
+}

@@ -1,0 +1,10 @@
+# Fins de ligne fixées quel que soit l'OS qui fait le commit :
+# un .command ou un .sh en CRLF casse sur Mac et Linux (« bad interpreter »),
+# un .bat en LF peut mal se comporter sur Windows.
+* text=auto
+*.command text eol=lf
+*.sh text eol=lf
+*.js text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.png binary
